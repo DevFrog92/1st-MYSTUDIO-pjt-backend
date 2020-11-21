@@ -12,25 +12,25 @@
     <h3>Hello, {{ user.username }}</h3>
     {% comment %} <a href="{% url 'movies:index' %}">Movies</a>
     <a href="{% url 'movies:select' %}">Movie Recommand</a> {% endcomment %}
-    {% if request.user.is_authenticated %}
+    {% comment %} {% if request.user.is_authenticated %} {% endcomment %}
       <a href="{% url 'community:index' %}">Community</a>
-      <a href="{% url 'accounts:update' %}">update</a>
+      {% comment %} <a href="{% url 'accounts:update' %}">update</a>
       <a href="{% url 'accounts:change_password' %}">password</a>
       <a href="{% url 'accounts:update_profile' request.user.pk%}">update_profile</a>
-      <a href="{% url 'accounts:profile' request.user.pk%}">profile</a>
+      <a href="{% url 'accounts:profile' request.user.pk%}">profile</a> {% endcomment %}
       {% comment %} <a href="{% url 'community:create' %}">New Review</a> {% endcomment %}
-      <form action="{% url 'accounts:logout' %}" method="POST">
+      {% comment %} <form action="{% url 'accounts:logout' %}" method="POST"> {% endcomment %}
         {% csrf_token %}
         <input type="submit" value="Logout">
-      <form action="{% url 'accounts:delete' %}" method="POST">
+      {% comment %} <form action="{% url 'accounts:delete' %}" method="POST"> {% endcomment %}
         {% csrf_token %}
         <input type="submit" value="delete">
       </form>
       
-    {% else %}
-      <a href="{% url 'accounts:signup' %}">Signup</a>
-      <a href="{% url 'accounts:login' %}">Login</a>
-    {% endif %}
+    {% comment %} {% else %} {% endcomment %}
+      {% comment %} <a href="{% url 'accounts:signup' %}">Signup</a>
+      <a href="{% url 'accounts:login' %}">Login</a> {% endcomment %}
+    {% comment %} {% endif %} {% endcomment %}
     <hr/>
     {% block content %}
     {% endblock %}

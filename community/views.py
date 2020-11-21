@@ -1,17 +1,21 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.contrib.auth.decorators import login_required
 from .models import Review, Comment
 from .forms import ReviewForm, CommentForm
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework.status import HTTP_200_OK
+from rest_framework.status import HTTP_200_OK,HTTP_201_CREATED,HTTP_403_FORBIDDEN
 from .serializers import ReviewSerializer
-
-
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import authentication_classes,permission_classes
 
 
 @api_view(['POST'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def analyze_image(request):
     # print(request.FILES)
     # src = request.FILES['files'] # 파일이 하나일 경우
@@ -19,6 +23,7 @@ def analyze_image(request):
     #    upload_img = UploadImage.objects.create(image=img, .....)
     serializer = ReviewSerializer(data=request.data)
     print(request.data)
+    print(serializer)
     print(serializer.is_valid())
     ########
     # ########
@@ -28,9 +33,11 @@ def analyze_image(request):
     return Response('response할 내용')
 
 #################################
-
 @api_view(['GET'])
+# @authentication_classes([JSONWebTokenAuthentication])
+# @permission_classes([IsAuthenticated])
 def index(request):
+    print('들어왔어')
     reviews = Review.objects.order_by('-pk')
     serializer = ReviewSerializer(reviews,many=True)
     print(serializer.data)
@@ -38,12 +45,74 @@ def index(request):
         'reviews': reviews,
     }
     return Response(serializer.data,status=HTTP_200_OK)
+    # return render(request,'community/index.html',context)
 
 
+@api_view(['GET','POST'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def review_read_create(request):
+    '''
+    Todo List 조회 및 Todo를 생성하는 함수입니다.
+    '''
+    if request.method == 'GET':
+        # 1. 작성자에 따른 글을 가지고 온다.
+        print(request.user)
+        reviews_list = request.user.reviews
+        # todo_list = Todo.objects.filter(user = request.user)
+        serializer = ReviewSerializer(reviews_list,many=True)
+        return Response(serializer.data)
+    else:
+        serializer = ReviewSerializer(data=request.data)
+        print(request.user,request.data)
+        if serializer.is_valid(raise_exception=True):
+            print('저장한다.')
+            serializer.save(user=request.user)
+            return Response(serializer.data,status=HTTP_201_CREATED)
+
+
+
+
+@api_view(['PUT','DELETE'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def review_update_delete(request,review_id):
+    print('함수들어간다')
+    '''
+    Todo를 수정 혹은 삭제하는 함수입니다.
+    '''
+    review = get_object_or_404(Review,pk=review_id)
+
+    if review.user != request.user:
+        return Response({'detail':'권한이 없습니다.'},status=HTTP_403_FORBIDDEN)
+    print('일단 지나간다',request.method)
+    if request.method =='PUT':
+        print('변환한다',request,review)
+        serializer = ReviewSerializer(review,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            print('저장한다')
+            serializer.save()
+            return Response(serializer.data)
+    else:
+        review.delete()
+        return Response({'message':'안녕'})
+
+
+
+
+
+
+
+
+
+# @login_required
 @require_http_methods(['GET', 'POST'])
 def create(request):
     if request.method == 'POST':
+        print(request.user)
+        print(request.POST,request.FILES)
         form = ReviewForm(request.POST,request.FILES) 
+        print(form)
         if form.is_valid():
             review = form.save(commit=False)
             review.user = request.user
@@ -55,7 +124,7 @@ def create(request):
         'form': form,
     }
     return render(request, 'community/create.html', context)
-
+@login_required
 @require_http_methods(['GET', 'POST'])
 def update(request, review_pk):
     # 없는 pk로 접근했을때 404

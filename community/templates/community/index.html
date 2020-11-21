@@ -2,14 +2,14 @@
 {% load static %}
 {% block content %}
   <h1>Community</h1>
-  {% if user.is_authenticated %}
+  {% comment %} {% if user.is_authenticated %} {% endcomment %}
     <a href="{% url 'community:create' %}">NEW</a>
-  {% else %}
-    <a href="{% url 'accounts:login' %}">[새 글을 작성하려면 로그인하세요]</a>
-  {% endif %}
+  {% comment %} {% else %} {% endcomment %}
+    {% comment %} <a href="{% url 'accounts:login' %}">[새 글을 작성하려면 로그인하세요]</a> {% endcomment %}
+  {% comment %} {% endif %} {% endcomment %}
   <hr>
   {% for review in reviews %}
-    <p><b>작성자 : <a href="{% url 'accounts:profile' review.user.pk %}">{{ review.user }}</a></b></p>
+    {% comment %} <p><b>작성자 : <a href="{% url 'accounts:profile' review.user.pk %}">{{ review.user }}</a></b></p> {% endcomment %}
     <p>글 번호: {{ review.pk }}</p>
     <p>글 제목: {{ review.title }}</p>
     <p>글 내용: {{ review.content }}</p>

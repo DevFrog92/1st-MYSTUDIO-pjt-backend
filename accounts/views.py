@@ -8,25 +8,32 @@ from django.views.decorators.http import require_POST, require_http_methods
 from .forms import CustomUserCreationForm,CustomUserChangeForm,ProfileForm
 from .models import Profile
 from django.http import JsonResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.status import (
+    HTTP_400_BAD_REQUEST,
+    HTTP_201_CREATED
+)
+from .serializers import UserSerializer
 
-@require_http_methods(['GET', 'POST'])
+@api_view(['POST'])
 def signup(request):
-    if request.user.is_authenticated:
-        return redirect('community:index')
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            Profile.objects.create(user=user)
-            
-            auth_login(request, user)
-            return redirect('community:index')
-    else:
-        form = CustomUserCreationForm()
-    context = {
-        'form': form,
-    }
-    return render(request, 'accounts/signup.html', context)
+    print(request.data)
+    password = request.data.get('password')
+    passwordConfirmation = request.data.get('passwordConfirmation')
+
+    if password != passwordConfirmation:
+        print('다른데?',passwordConfirmation,password)
+        return Response({'error':'비밀번호가 다릅니다.'},status=HTTP_400_BAD_REQUEST)
+    serializer = UserSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        user = serializer.save()
+        Profile.objects.create(user = user)
+        # 비밀번호 해싱 작업이 필요하다.
+        user.set_password(password)
+        user.save()
+        print(user.password)
+        return Response(serializer.data,status=HTTP_201_CREATED)
 
 
 @require_http_methods(['GET', 'POST'])
