@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from imagekit.models import ProcessedImageField
 from imagekit.processors import Thumbnail
+from imagekit.models import ProcessedImageField
+from imagekit.processors import ResizeToFill
 
 
 class Review(models.Model):
@@ -27,3 +29,20 @@ class Comment(models.Model):
     content = models.TextField()
     review = models.ForeignKey(Review, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+
+class Profile(models.Model):
+    # user model 1:1
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    description = models.TextField(blank=True)
+    nickname = models.CharField(max_length=40,blank=True)
+    genre = models.CharField(max_length=100,blank=True)
+    img = ProcessedImageField(
+        blank = True,
+        upload_to = 'profile/images',
+        processors=[
+           ResizeToFill(300, 300)
+        ],
+        format='JPEG',
+        options = {'quality':90},
+    )

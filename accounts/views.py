@@ -14,7 +14,10 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_201_CREATED
 )
-from .serializers import UserSerializer
+from .serializers import UserSerializer,ProfileSerializer
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import authentication_classes,permission_classes
 
 @api_view(['POST'])
 def signup(request):
@@ -99,14 +102,22 @@ def change_password(request):
     }
     return render(request,'accounts/change_password.html',context)
 
-@login_required
-def profile(request, user_id):
-    person = get_object_or_404(get_user_model(), pk=user_id)
-    print(person.profile.img)
-    context = {
-        'person': person,
-    }
-    return render(request, 'accounts/profile.html', context)
+# @api_view(['GET','POST'])
+# @authentication_classes([JSONWebTokenAuthentication])
+# @permission_classes([IsAuthenticated])
+# def profile(request):
+#     if request.method == 'GET':
+#         if Profile.objects.filter(user_is = request.user.pk):
+#             return Response({'message':'이미존재합니다'})
+#         else:
+#             profile = Profile.objects.create(user=request.user)
+#             return Response({'profile':profile})
+#     else:
+#         profile = get_object_or_404(Profile,user_id = request.user.pk)
+#         print(profile)
+#         serializer = ProfileSerializer(profile)
+#         return Response(serializer.data)
+        
 
 
 @require_POST

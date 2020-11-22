@@ -13,4 +13,7 @@ urlpatterns = [
     path('review/<int:review_pk>/comments/', views.create_comment, name='create_comment'),
     path('review/<int:review_pk>/like/', views.like, name='like'),
     path('analyze_image/', views.analyze_image, name='analyze_image'),
+    path('profile/',views.profile,name = 'profile'),
+    path('updateprofile/',views.updateprofile,name = 'updateprofile'),
+
 ]

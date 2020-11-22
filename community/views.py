@@ -1,17 +1,52 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.contrib.auth.decorators import login_required
-from .models import Review, Comment
+from .models import Review, Comment,Profile
 from .forms import ReviewForm, CommentForm
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.status import HTTP_200_OK,HTTP_201_CREATED,HTTP_403_FORBIDDEN
-from .serializers import ReviewSerializer
+from .serializers import ReviewSerializer,ProfileSerializer
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import authentication_classes,permission_classes
 
+
+@api_view(['GET','POST'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def profile(request):
+    if request.method == 'GET':
+        print('들어간다')
+        if Profile.objects.filter(user_id = request.user.pk):
+            print('존재한다')
+            return Response({'message':'이미존재합니다'})
+        else:
+            profile = Profile.objects.create(user=request.user)
+            print('생성했다',profile)
+            serializer = ProfileSerializer(profile)
+            return Response(serializer)
+    else:
+        profile = get_object_or_404(Profile,user_id = request.user.pk)
+        print(profile)
+        serializer = ProfileSerializer(profile)
+        print(serializer.data)
+        return Response(serializer.data)
+
+@api_view(['PUT'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def updateprofile(request):
+    profile = get_object_or_404(Profile,user_id = request.user.pk)
+    print('여기야',request.data)
+    print(request.data.get('description'))
+    print(request.data.get('nickname'))
+    profile.description = request.data.get('description')
+    profile.nickname = request.data.get('nickname')
+    profile.genre = request.data.get('genre')
+    profile.save()
+    return Response('response data')
 
 @api_view(['POST'])
 @authentication_classes([JSONWebTokenAuthentication])
