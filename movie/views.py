@@ -63,17 +63,34 @@ def watch(request):
 @authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
 def recommend(request):
+    genre_id = {'drama':18,'fantasy':14,'horror':27,'romance':10749,'adventure':12,'thriller':53,
+    'comedy':35,'mystery':9648,'war':10752,'action':28,'sf':878,'animation':16,'crime':80,'documentary':99,
+    'family':10751,'history':36,'music':10402}
     print('요청이다',request.data)
-    NAVER_CLIENT_ID = "PPySn5sWHmnsUYJAA5EK"
-    NAVER_CLIENT_SECRET = "dC7DXrWDl_"
+    keyword = {}
+    tmp = list(map(int,request.data.get('genre').split(',')))
+    temp = {}
+    genre_name =[]
+    for idx in tmp:
+        for key,value in genre_id.items():
+            if value == idx:
+                temp[key] = []
+                genre_name.append(key)
 
-    url = "https://openapi.naver.com/v1/search/movie?query=action"
+    for i in range(1,3):
+        key = 'e37c0ae71977e8ad20b5a3f6caa339a1'
+        url = f"https://api.themoviedb.org/3/movie/top_rated?api_key={key}&language=ko-KR&page={i}"
+        print(url)
+        result = requests.get(urlparse(url).geturl())
+        response = result.json()
+        print(response)
 
-    result = requests.get(urlparse(url).geturl(),
-            headers = {"X-Naver-Client-Id":NAVER_CLIENT_ID,
-            "X-Naver-Client-Secret":NAVER_CLIENT_SECRET})
-    json_object = result.json()
-
-    print(json_object)
-
-    return Response({'data':json_object})
+        for item in response['results']:
+            print(item)
+            for idx in item['genre_ids']:
+                if idx in tmp:
+                    for key,value in genre_id.items():
+                        if value == idx and item not in temp[key]:
+                            temp[key].append(item)
+        print(temp)
+    return Response({'data':temp,'data2':genre_name})
