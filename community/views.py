@@ -93,7 +93,8 @@ def review_read_create(request):
     if request.method == 'GET':
         # 1. 작성자에 따른 글을 가지고 온다.
         print(request.user)
-        reviews_list = request.user.reviews
+        # reviews_list = request.user.reviews
+        reviews_list = Review.objects.all()
         # todo_list = Todo.objects.filter(user = request.user)
         serializer = ReviewSerializer(reviews_list,many=True)
         return Response(serializer.data)
