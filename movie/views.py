@@ -7,6 +7,14 @@ from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import authentication_classes,permission_classes
 from rest_framework.status import HTTP_201_CREATED
+
+import os
+import sys
+import urllib.request
+import requests
+from urllib.parse import urlparse
+import datetime
+
 # Create your views here.
 
 @api_view(['GET'])
@@ -49,3 +57,23 @@ def watch(request):
     ghibri.save()
     print(ghibri.howlsmovingcastle)
     return Response({'message':'안돼'})
+
+
+@api_view(['POST'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def recommend(request):
+    print('요청이다',request.data)
+    NAVER_CLIENT_ID = "PPySn5sWHmnsUYJAA5EK"
+    NAVER_CLIENT_SECRET = "dC7DXrWDl_"
+
+    url = "https://openapi.naver.com/v1/search/movie?query=action"
+
+    result = requests.get(urlparse(url).geturl(),
+            headers = {"X-Naver-Client-Id":NAVER_CLIENT_ID,
+            "X-Naver-Client-Secret":NAVER_CLIENT_SECRET})
+    json_object = result.json()
+
+    print(json_object)
+
+    return Response({'data':json_object})
