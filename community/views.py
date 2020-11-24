@@ -11,6 +11,18 @@ from .serializers import ReviewSerializer,ProfileSerializer
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import authentication_classes,permission_classes
+import random 
+
+profile_imgages = [
+
+    '/profile/ogu.jpg',
+    '/profile/marvel.png',
+    '/profile/totoro.png',
+    '/profile/tube.png',
+    '/profile/zordy.png'
+]
+
+
 
 
 @api_view(['GET','POST'])
@@ -20,13 +32,26 @@ def profile(request):
     if request.method == 'GET':
         print('들어간다')
         if Profile.objects.filter(user_id = request.user.pk):
+            profile = get_object_or_404(Profile,user_id = request.user.pk)          
+            index = random.sample(profile_imgages,1)
+            print(str(index[0]))
+            profile.img = str(index[0])
+            profile.username = request.user.username
+            profile.save()
+            print(type(str(index[0])))
             print('존재한다')
             return Response({'message':'이미존재합니다'})
         else:
             profile = Profile.objects.create(user=request.user)
+            index = random.sample(profile_imgages,1)
+            print(str(index[0]))
+            profile.img = str(index[0])
+            profile.username = request.user.username
+            print(request.user.username)
+            profile.save()
             print('생성했다',profile)
             serializer = ProfileSerializer(profile)
-            return Response(serializer)
+            return Response(serializer.data)
     else:
         profile = get_object_or_404(Profile,user_id = request.user.pk)
         print(profile)
@@ -45,6 +70,8 @@ def updateprofile(request):
     profile.description = request.data.get('description')
     profile.nickname = request.data.get('nickname')
     profile.genre = request.data.get('genre')
+    profile.best_movie_title = request.data.get('best_movie_title')
+    profile.best_movie_id = request.data.get('best_movie_id')
     profile.save()
     return Response('response data')
 
