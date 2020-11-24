@@ -7,26 +7,23 @@ from imagekit.processors import ResizeToFill
 
 
 class Review(models.Model):
-    title = models.CharField(max_length=100)
     movie_title = models.CharField(max_length=50)
-    rank = models.IntegerField()
+    rank = models.IntegerField(default=1)
     content = models.TextField()
-    # img = ProcessedImageField(
-    #     blank = True,
-    #     upload_to = '%Y/%m/%d/',
-    #     processors=[
-    #         Thumbnail(width=500)
-    #     ],
-    #     format='JPEG'
-    # )
+    poster_path = models.TextField(blank=True)
+    movie_id = models.CharField(max_length=100,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    username = models.CharField(max_length=100,blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,related_name='reviews')
     like_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='like_reviews')
 
 
 class Comment(models.Model):
     content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    username = models.CharField(max_length=100,blank=True)
     review = models.ForeignKey(Review, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 

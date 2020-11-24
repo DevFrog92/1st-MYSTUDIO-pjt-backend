@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.status import HTTP_200_OK,HTTP_201_CREATED,HTTP_403_FORBIDDEN
-from .serializers import ReviewSerializer,ProfileSerializer
+from .serializers import ReviewSerializer,ProfileSerializer,CommentSerializer
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import authentication_classes,permission_classes
@@ -33,12 +33,8 @@ def profile(request):
         print('들어간다')
         if Profile.objects.filter(user_id = request.user.pk):
             profile = get_object_or_404(Profile,user_id = request.user.pk)          
-            index = random.sample(profile_imgages,1)
-            print(str(index[0]))
-            profile.img = str(index[0])
             profile.username = request.user.username
             profile.save()
-            print(type(str(index[0])))
             print('존재한다')
             return Response({'message':'이미존재합니다'})
         else:
@@ -130,7 +126,7 @@ def review_read_create(request):
         print(request.user,request.data)
         if serializer.is_valid(raise_exception=True):
             print('저장한다.')
-            serializer.save(user=request.user)
+            serializer.save(user=request.user,username=request.user.username)
             return Response(serializer.data,status=HTTP_201_CREATED)
 
 
@@ -226,30 +222,59 @@ def detail(request, review_pk):
     return render(request, 'community/detail.html', context)
 
 
-@require_POST
-def create_comment(request, review_pk):
+
+
+@api_view(['GET','POST'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def read_create_comment(request, review_pk):
     review = get_object_or_404(Review, pk=review_pk)
-    comment_form = CommentForm(request.POST)
-    if comment_form.is_valid():
-        comment = comment_form.save(commit=False)
-        comment.review = review
-        comment.user = request.user
-        comment.save()
-        return redirect('community:detail', review.pk)
-    context = {
-        'comment_form': comment_form,
-        'review': review,
-        'comments': review.comment_set.all(),
-    }
-    return render(request, 'community/detail.html', context)
+    print(review_pk)
+    if request.method == 'GET':
+        comments = review.comment_set.all()
+        print(comments)
+        serializer = CommentSerializer(comments,many=True)
+        return Response(serializer.data)
+    else:
+        print('들어ㅏ왔다잉',request.data)
+        serializer = CommentSerializer(data=request.data)
+        print('생성한다')
+        if serializer.is_valid(raise_exception=True):
+            print('검사한다잉')
+            serializer.save(user = request.user,username=request.user.username,review=review)
+            return Response(serializer.data)
+
+@api_view(['DELETE'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_comment(request,comment_pk):
+    comment = get_object_or_404(Comment,pk=comment_pk)
+    print(comment)
+    comment.delete()
+    return Response({'message':'delete'})
 
 
-@require_POST
+
+
+
+
+@api_view(['GET','POST'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def like(request,review_pk):
+    print('들어온다',request.user.pk)
     review = get_object_or_404(Review,pk=review_pk)
-    if request.user.is_authenticated:
-        user = request.user
-        auth_user = True
+    print('있다',review)
+    user = request.user
+    if request.method=='GET':
+        if review.like_users.filter(pk=user.pk).exists():
+            liked = False
+            count = review.like_users.count()
+        else:
+            liked = True
+            count = review.like_users.count()
+        return Response({'count':count,'liked':liked})
+    else:
         if review.like_users.filter(pk=user.pk).exists():
             review.like_users.remove(user)
             liked = False
@@ -258,13 +283,8 @@ def like(request,review_pk):
             review.like_users.add(user)
             liked = True
             count = review.like_users.count()
-    else:
-        auth_user = False
-        liked = False
-        count = review.like_users.count()
-    context = {
-        'liked':liked,
-        'count':count,
-        'auth_user':auth_user,
-    }
-    return JsonResponse(context)
+        context = {
+            'liked':liked,
+            'count':count,
+        }
+        return JsonResponse(context)
