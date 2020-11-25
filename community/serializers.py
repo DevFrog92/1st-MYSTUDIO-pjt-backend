@@ -16,4 +16,4 @@ class ProfileSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ('id','content','username')
+        fields = ('id','content','username','created_at','updated_at')

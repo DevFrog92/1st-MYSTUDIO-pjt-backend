@@ -244,14 +244,45 @@ def read_create_comment(request, review_pk):
             serializer.save(user = request.user,username=request.user.username,review=review)
             return Response(serializer.data)
 
-@api_view(['DELETE'])
+# @api_view(['PUT'])
+# @authentication_classes([JSONWebTokenAuthentication])
+# @permission_classes([IsAuthenticated])
+# def read_create_comment(request, review_pk):
+#     review = get_object_or_404(Review, pk=review_pk)
+#     print(review_pk)
+#     if request.method == 'GET':
+#         comments = review.comment_set.all()
+#         print(comments)
+#         serializer = CommentSerializer(comments,many=True)
+#         return Response(serializer.data)
+#     else:
+#         print('들어ㅏ왔다잉',request.data)
+#         serializer = CommentSerializer(data=request.data)
+#         print('생성한다')
+#         if serializer.is_valid(raise_exception=True):
+#             print('검사한다잉')
+#             serializer.save(user = request.user,username=request.user.username,review=review)
+#             return Response(serializer.data)
+
+
+
+
+
+@api_view(['DELETE','PUT'])
 @authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
-def delete_comment(request,comment_pk):
+def delete_update_comment(request,comment_pk):
     comment = get_object_or_404(Comment,pk=comment_pk)
-    print(comment)
-    comment.delete()
-    return Response({'message':'delete'})
+    if request.method == 'DELETE':
+        print(comment)
+        comment.delete()
+        return Response({'message':'delete'})
+    else:
+        serializer = CommentSerializer(comment,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user = request.user,username=request.user.username)
+            return Response(serializer.data)
+
 
 
 
@@ -288,3 +319,6 @@ def like(request,review_pk):
             'count':count,
         }
         return JsonResponse(context)
+
+
+

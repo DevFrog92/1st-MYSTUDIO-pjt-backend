@@ -6,5 +6,6 @@ urlpatterns = [
     path('',views.movielist,name='movielist'),
     path('create/',views.createroadmap,name='createroadmap'),
     path('watch/',views.watch,name='watch'),
-    path('recommend/',views.recommend,name='recommend')
+    path('recommend/',views.recommend,name='recommend'),
+    path('<int:movie_id>/favorite_read_save/',views.favorite_read_save,name='favorite_read_save'),
 ]
