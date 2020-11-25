@@ -101,27 +101,44 @@ def recommend(request):
 @permission_classes([IsAuthenticated])
 def favorite_read_save(request,movie_id):
     user = request.user
-    print('들어왔어',movie_id)
-    if user.favorite.filter(movie_id= movie_id):
-        favorite = user.favorite.get(movie_id= movie_id)
-        print('존재해',movie_id)
-        print('뽑아왔어',favorite.pk)
-        favorite.favorite_user.remove(user)
-        favorite.delete()
-
-        print('여기가 문제일거 같아')
-        print('그럼 여긴가?')
-        return Response({'message':'delete'})
+    if request.method == 'GET':
+        favorite_list = user.favorite.all()
+        serializer = FavoriteMovieSerializer(favorite_list,many=True)
+        return Response(serializer.data)
     else:
-        print('존재하지 않아')
-        serializer = FavoriteMovieSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(user = user)
+        print('들어왔어',movie_id)
+        if user.favorite.filter(movie_id= movie_id):
             favorite = user.favorite.get(movie_id= movie_id)
+            print('존재해',movie_id)
+            print('뽑아왔어',favorite.pk)
+            favorite.favorite_user.remove(user)
+            favorite.delete()
 
-            favorite.favorite_user.add(user)
-            return Response({'message':'성공'})
+            print('여기가 문제일거 같아')
+            print('그럼 여긴가?')
+            return Response({'state':False})
+        else:
+            print('존재하지 않아')
+            serializer = FavoriteMovieSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save(user = user)
+                favorite = user.favorite.get(movie_id= movie_id)
+
+                favorite.favorite_user.add(user)
+                return Response({'state':True})
+
+@api_view(['GET'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def favorite_state(request,movie_id):
+    user = request.user
+    if user.favorite.filter(movie_id= movie_id):
+        return Response({'state':True})
+    else:
+        return Response({'state':False})
+
     
+
     # if request.method == 'GET':
     #     favorite_list = user.favorite.all()
     #     serializer = FavoriteMovieSerializer(favorite_list,many=True)
