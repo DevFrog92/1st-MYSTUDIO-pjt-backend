@@ -303,10 +303,10 @@ def like(request,review_pk):
     user = request.user
     if request.method=='GET':
         if review.like_users.filter(pk=user.pk).exists():
-            liked = False
+            liked = True
             count = review.like_users.count()
         else:
-            liked = True
+            liked = False
             count = review.like_users.count()
         return Response({'count':count,'liked':liked})
     else:
