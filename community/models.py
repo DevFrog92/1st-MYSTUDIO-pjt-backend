@@ -34,8 +34,12 @@ class Profile(models.Model):
     description = models.TextField(blank=True)
     nickname = models.CharField(max_length=40,blank=True)
     genre = models.CharField(max_length=100,blank=True)
-    best_movie_title = models.CharField(max_length=50,blank=True)
-    best_movie_id = models.CharField(max_length=100,blank=True)
+    best_movie_title_1 = models.CharField(max_length=50,blank=True)
+    best_movie_id_1 = models.CharField(max_length=100,blank=True)
+    best_movie_title_2 = models.CharField(max_length=50,blank=True)
+    best_movie_id_2 = models.CharField(max_length=100,blank=True)
+    best_movie_title_3 = models.CharField(max_length=50,blank=True)
+    best_movie_id_3 = models.CharField(max_length=100,blank=True)
     username = models.CharField(max_length=100,blank=True)
     img = ProcessedImageField(
         blank = True,

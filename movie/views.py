@@ -127,6 +127,20 @@ def favorite_read_save(request,movie_id):
                 favorite.favorite_user.add(user)
                 return Response({'state':True})
 
+
+
+@api_view(['GET'])
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
+def favorite_read_all(request):
+    user = request.user
+    favorite_list = user.favorite.all()
+    print(favorite_list)
+    serializer = FavoriteMovieSerializer(favorite_list,many=True)
+    print(serializer)
+    return Response(serializer.data)
+
+
 @api_view(['GET'])
 @authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
