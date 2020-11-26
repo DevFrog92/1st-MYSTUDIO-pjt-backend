@@ -23,8 +23,6 @@ profile_imgages = [
 ]
 
 
-
-
 @api_view(['GET','POST'])
 @authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -49,8 +47,7 @@ def profile(request):
         return Response(serializer.data)
 
 @api_view(['PUT'])
-@authentication_classes([JSONWebTokenAuthentication])
-@permission_classes([IsAuthenticated])
+ 
 def updateprofile(request):
     profile = get_object_or_404(Profile,user_id = request.user.pk)
     profile.description = request.data.get('description')
