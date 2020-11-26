@@ -47,7 +47,8 @@ def profile(request):
         return Response(serializer.data)
 
 @api_view(['PUT'])
- 
+@authentication_classes([JSONWebTokenAuthentication])
+@permission_classes([IsAuthenticated])
 def updateprofile(request):
     profile = get_object_or_404(Profile,user_id = request.user.pk)
     profile.description = request.data.get('description')
@@ -108,7 +109,7 @@ def review_read_create(request):
         # 1. 작성자에 따른 글을 가지고 온다.
         print(request.user)
         # reviews_list = request.user.reviews
-        reviews_list = Review.objects.all()
+        reviews_list = Review.objects.order_by('-pk')
         # todo_list = Todo.objects.filter(user = request.user)
         serializer = ReviewSerializer(reviews_list,many=True)
         return Response(serializer.data)
@@ -263,16 +264,21 @@ def read_create_comment(request, review_pk):
 @authentication_classes([JSONWebTokenAuthentication])
 @permission_classes([IsAuthenticated])
 def delete_update_comment(request,comment_pk):
+    res_user = request.user
     comment = get_object_or_404(Comment,pk=comment_pk)
-    if request.method == 'DELETE':
-        print(comment)
-        comment.delete()
-        return Response({'message':'delete'})
+    print(res_user.id, comment.user_id) 
+    if res_user.id == comment.user_id:
+        if request.method == 'DELETE':
+            print(comment)
+            comment.delete()
+            return Response({'message':'delete'})
+        else:
+            serializer = CommentSerializer(comment,data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save(user = request.user,username=request.user.username)
+                return Response(serializer.data)
     else:
-        serializer = CommentSerializer(comment,data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(user = request.user,username=request.user.username)
-            return Response(serializer.data)
+        return Response({'message':'404'})
 
 
 
