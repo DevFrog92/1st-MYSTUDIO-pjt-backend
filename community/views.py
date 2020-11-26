@@ -30,29 +30,22 @@ profile_imgages = [
 @permission_classes([IsAuthenticated])
 def profile(request):
     if request.method == 'GET':
-        print('들어간다')
         if Profile.objects.filter(user_id = request.user.pk):
             profile = get_object_or_404(Profile,user_id = request.user.pk)          
             profile.username = request.user.username
             profile.save()
-            print('존재한다')
             return Response({'message':'이미존재합니다'})
         else:
             profile = Profile.objects.create(user=request.user)
             index = random.sample(profile_imgages,1)
-            print(str(index[0]))
             profile.img = str(index[0])
             profile.username = request.user.username
-            print(request.user.username)
             profile.save()
-            print('생성했다',profile)
             serializer = ProfileSerializer(profile)
             return Response(serializer.data)
     else:
         profile = get_object_or_404(Profile,user_id = request.user.pk)
-        print(profile)
         serializer = ProfileSerializer(profile)
-        print(serializer.data)
         return Response(serializer.data)
 
 @api_view(['PUT'])
@@ -60,9 +53,6 @@ def profile(request):
 @permission_classes([IsAuthenticated])
 def updateprofile(request):
     profile = get_object_or_404(Profile,user_id = request.user.pk)
-    print('여기야',request.data)
-    print(request.data.get('description'))
-    print(request.data.get('nickname'))
     profile.description = request.data.get('description')
     profile.nickname = request.data.get('nickname')
     profile.genre = request.data.get('genre')

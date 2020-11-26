@@ -9,6 +9,11 @@
 
 #### (2) 업무 분담 내역
 
+- 권용수 
+  - Django server & Vue Client
+- 강민지
+  - Vue Client & Design
+
 
 
 ### 2. 목표 
@@ -23,7 +28,7 @@
 
 #### (1) 세부 일정
 
-
+![image-20201126235850513](README.assets/image-20201126235850513.png)
 
 #### (2) 기본 구현 예정 기능
 
@@ -72,12 +77,15 @@
 - Git
 - 카카오 OVEN
 - VS CODE
+- ERD Cloud
 
 
 
 #### 4. ERD
 
 
+
+![image-20201126234024777](README.assets/image-20201126234024777.png)
 
 
 
@@ -110,7 +118,7 @@
 
 
 - 오류: 사용자의 프로필 업데이트를 위해서 별도의 Profile 모델을 구성 하였지만, 기본 프로필이 없어 오류 발생
-  - 해결: 현재 해결중(11/19)
+  - 해결: 현재 해결중(11/19) > 해결(11/21) PUT 요청으로 요청 방식 변경
 
 <img src="README.assets/image-20201119163429542.png" alt="image-20201119163429542" style="zoom:80%;" />
 
@@ -168,15 +176,17 @@
 
 ##### TODAY 오류 해결 과정
 
-- 오류 : 
-  - 해결 : 
+- 오류 : rest-auth 사용에 문제가 발생
+  - 해결 : 공식 문서를 통해서 해결
+    - `@authentication_classes([JSONWebTokenAuthentication])`
+    - `@permission_classes([IsAuthenticated])`
 
 <img src="README.assets/%EC%97%90%EB%9F%AC%EB%AA%A8%EC%9D%8C1.png" alt="에러모음1" style="zoom:67%;" />
 
 
 
-- 오류: 
-  - 해결: 
+- 오류: 어떤 오류인지 파악하기 힘듬
+  - 해결: 콤마 때문에 오류 발생
 
 <img src="README.assets/%EC%97%90%EB%9F%AC%EB%AA%A8%EC%9D%8C2.png" alt="에러모음2" style="zoom: 67%;" />
 
@@ -196,7 +206,10 @@
 
 ##### TODAY 느낀점
 
-- 
+- rest-auth라는 새로운 프레임 워크를 사용하여 간편하게 로그인 기능을 구현할 수 있었지만, 사용하는 것이 매우 까다로웠다.
+- 모르는 것이 있으면 공식문서를 확인하자. 제발.
+- https://django-rest-auth.readthedocs.io/en/latest/api_endpoints.html
+- https://django-rest-auth.readthedocs.io/en/latest/configuration.html
 
 
 
@@ -229,17 +242,12 @@
 
 ##### TODAY 오류 해결 과정
 
-- 오류 : 
-  - 해결 : 
+- 오류 : iframe 사용시 오류가 발생
+  - 해결 : vue에서 사용하기 위해서 watch 방식이 아닌 embed방식으로 요청해야한다.
 
 <img src="README.assets/1121%EC%98%A4%EB%A5%981.png" alt="1121오류1" style="zoom: 50%;" />
 
 
-
-
-
-- 오류: 
-  - 해결: 
 
 ![1121오류2](README.assets/1121%EC%98%A4%EB%A5%982.png)
 
@@ -256,7 +264,10 @@
 
 ##### TODAY 느낀점
 
-- 
+- 로드맵을 통해서 사용자만의 영화 목록을 보여주고 싶었지만, 클라이언트 쪽의 미디어 파일을 서버로 업로드는 하는 문제가 발생하여 해결하지 못했다.
+- 제발....공식문서 좀.....
+- https://developers.themoviedb.org/3/search/search-movies
+- https://bootstrap-vue.org/docs
 
 
 
@@ -286,15 +297,15 @@
 
 ##### TODAY 오류 해결 과정
 
-- 오류 : 
-  - 해결 : 
+- 오류 : 네이버 API 요청을 VUE에서 보냈지만 CORS 오류가 발생, 장고에 CORS오류 방어를 수행하였지만 여전히 발생
+  - 해결 : 네이버는 사내 규칙으로 API 요청은 서버에서 보낸 요청만 응답
 
 ![1123오류모음](README.assets/1123%EC%98%A4%EB%A5%98%EB%AA%A8%EC%9D%8C.png)
 
 
 
-- 오류: 
-  - 해결: 
+- 오류: 웹에 존재하는 스타일을 사용하기 위해서 적용하였지만 오류가 발생
+  - 해결:  SCSS 를 CSS로 변환하여 적용
 
 <img src="README.assets/1123%EC%98%A4%EB%A5%98.png" alt="1123오류"  />
 
@@ -310,7 +321,10 @@
 
 ##### TODAY 느낀점
 
-- 
+- CSS GRID SYSTEM에 대한 이해가 높지 못 하여 아이콘 하나를 마음대로 배치하는 것이 매우 어려웠다.
+- 오늘도 공식문서를 찾아다녔다...
+- https://github.com/greyby/vue-spinner
+- https://wlada.github.io/vue-carousel-3d/
 
 
 
@@ -344,23 +358,24 @@
 
 ##### TODAY 오류 해결 과정
 
-- 오류 : 
-  - 해결 : 
+- 오류 : 마침 태그에 의한 오류
+
+
 
 <img src="README.assets/%EC%98%A4%EB%A5%981.PNG" alt="오류1" style="zoom: 33%;" />
 
 
 
-- 오류: 
-  - 해결: 
+- 오류: id 선택자를 적용하였지만 반응하지 않음
+  - 해결: id선택자를 클래스 선택자로 선택하여 선택되지 않았음
 
 <img src="README.assets/%EC%98%A4%EB%A5%982%EB%B2%88.png" alt="오류2번" style="zoom: 33%;" />
 
 
 
-오류: 
+오류: 클래스 인라인 속성을 부여했을 때 오류가 발생
 
-- 해결: 
+- 해결: 한 줄로 코드가 표현되어 중복 클래스를 적용한 것을 인지하지 못함
 
 <img src="README.assets/%EC%98%A4%EB%A5%983%EB%B2%95%E3%84%B4.png" alt="오류3법ㄴ" style="zoom:33%;" />
 
@@ -374,13 +389,14 @@
 
 ##### TODAY 느낀점
 
-- 
+- 태그의 끝을 반드시 확인하자!!!!!!!!!!!!!!
+- 인라인 속성을 사랑하지 말자!!!!!!!!!
 
 
 
 ##### TOMORROW 계획 수립
 
-- 
+- 최종 웹페이지 프로토 타입 완성
 
 
 
@@ -395,23 +411,9 @@
 ##### TODAY 목표
 
 - 권용수
-  - 
+  - 즐겨찾기 기능 추가
 - 강민지
-  - 
-
-
-
-##### TODAY 오류 해결 과정
-
-- 오류 : 
-  - 해결 : 
-
-
-
-
-
-- 오류: 
-  - 해결: 
+  - Design
 
 
 
@@ -423,13 +425,13 @@
 
 ##### TODAY 느낀점
 
-- 
+- VUE를 이용하여 페이지간 이동시 데이터를 보내고 다시 이전 화면으로 돌아오는 것이 상당히 까다로웠다.
 
 
 
 ##### TOMORROW 계획 수립
 
-- 
+- 최종 완성된 프로젝트 점검 및 테스트
 
 
 
@@ -440,38 +442,24 @@
 ##### TODAY 목표
 
 - 권용수
-  - 
+  - 완성!!!!!!!!!!!!!!!!!!!!!!
+  - 12시전 퇴근
 - 강민지
-  - 
-
-
-
-##### TODAY 오류 해결 과정
-
-- 오류 : 
-  - 해결 : 
-
-
-
-
-
-- 오류: 
-  - 해결: 
-
-
+  - 완성!!!!!!!!!!!!!!!!!!!!!!
+  - 12 시전 퇴근
 
 ##### TODAY 결과
 
-![1125몽음](README.assets/1125%EB%AA%BD%EC%9D%8C.png)
+![image-20201127001106248](README.assets/image-20201127001106248.png)
 
 
 
 ##### TODAY 느낀점
 
-- 
+- 아직 추가하고 싶은 기능이 많지만, 1학기 과정이 끝나고 개인적으로 추가하여 완성하겠다.
+- 정말 잘 완성해서 배포하고 싶다....
+- 로드맵은 반드시 완성시킬 것이다..
+
+- 그리고 오늘은 12시 전 퇴근 실패...... 현재 시간 12시 11분....아직 할게 남았다......
 
 
-
-##### TOMORROW 계획 수립
-
-- 
